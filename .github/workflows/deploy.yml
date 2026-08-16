@@ -1,0 +1,38 @@
+name: React App CI/CD
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  build-and-deploy:
+    name: Build and Deploy React App
+    runs-on: self-hosted
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v5
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 18
+          cache: npm
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Build React application
+        run: |
+          npm run build
+
+      - name: Deploy application
+        run: |
+          rm -rf /var/www/html/*
+          cp -r build/. /var/www/html/
+
+      - name: Verify deployment
+        run: |
+          test -f /var/www/html/index.html
+          echo "React application deployed successfully"
